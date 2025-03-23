@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/myapi
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/api
   MANIFESTS_REPO: shaikhxsn/argo-app
   MANIFESTS_BRANCH: main
-  DEPLOYMENT_FILE: myapi/deployment.yaml
+  DEPLOYMENT_FILE: api/deployment.yml
 
 jobs:
 
