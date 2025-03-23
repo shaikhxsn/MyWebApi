@@ -1,0 +1,58 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/myapi
+  MANIFESTS_REPO: shaikhxsn/argo-app
+  MANIFESTS_BRANCH: main
+  DEPLOYMENT_FILE: myapi/deployment.yaml
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with: 
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set Docker Image Tag
+        run: echo "IMAGE_TAG=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t $DOCKER_IMAGE:${{ env.IMAGE_TAG }} .
+          docker push $DOCKER_IMAGE:${{ env.IMAGE_TAG }}
+
+      - name: Checkout Manifests Repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.MANIFESTS_REPO }}
+          token: ${{ secrets.MANIFESTS_REPO_TOKEN }}
+          path: manifests-repo
+          ref: ${{ env.MANIFESTS_BRANCH }}
+
+      - name: Update Kubernetes Deployment
+        run: |
+          cd manifests-repo
+          sed -i "s|image: .*|image: $DOCKER_IMAGE:${{ env.IMAGE_TAG }}|g" $DEPLOYMENT_FILE
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add $DEPLOYMENT_FILE
+          git commit -m "Update image to $DOCKER_IMAGE:${{ env.IMAGE_TAG }}"
+          git push origin ${{ env.MANIFESTS_BRANCH }}
+          
+      
