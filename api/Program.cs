@@ -39,7 +39,7 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapGet("/hello", () =>
 {
-    return "Hello from web api: " + Environment.MachineName;
+    return "Version 2: Hello from web api: " + Environment.MachineName;
 });
 
 app.Run();
