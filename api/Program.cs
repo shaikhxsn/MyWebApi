@@ -1,4 +1,5 @@
 using Serilog;
+using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +8,12 @@ builder.Services.AddSwaggerGen();
 
 Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
-            .WriteTo.File("logs/api-log-.txt", rollingInterval: RollingInterval.Day)
+            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = "api-logs-{0:yyyy.MM.dd}"
+            })
+            .Enrich.FromLogContext()
             .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -31,8 +37,6 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
-    Log.Information($"/hello called from : {Environment.MachineName}");
-
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
