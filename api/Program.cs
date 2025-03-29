@@ -1,9 +1,16 @@
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .WriteTo.File("logs/api-log-.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 
@@ -24,6 +31,8 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
+    Log.Information($"/hello called from : {Environment.MachineName}");
+
     var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
@@ -39,8 +48,11 @@ app.MapGet("/weatherforecast", () =>
 
 app.MapGet("/hello", () =>
 {
-    return "Version 2: Hello from web api: " + Environment.MachineName;
+    Log.Information($"/hello called from : {Environment.MachineName}");
+    return "Hello from web api: " + Environment.MachineName;
 });
+
+Log.Information("✅ Starting the app");
 
 app.Run();
 
