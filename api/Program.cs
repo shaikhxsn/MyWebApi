@@ -8,7 +8,7 @@ builder.Services.AddSwaggerGen();
 
 Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
-            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://elasticsearch:9200"))
             {
                 AutoRegisterTemplate = true,
                 IndexFormat = "api-logs-{0:yyyy.MM.dd}"
