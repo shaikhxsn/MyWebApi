@@ -6,17 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console()
-            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://elasticsearch:9200"))
-            {
-                AutoRegisterTemplate = true,
-                IndexFormat = "api-logs-{0:yyyy.MM.dd}"
-            })
-            .Enrich.FromLogContext()
-            .CreateLogger();
-
-builder.Host.UseSerilog();
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+});
 
 var app = builder.Build();
 
@@ -55,6 +48,8 @@ app.MapGet("/hello", () =>
     Log.Information($"/hello called from : {Environment.MachineName}");
     return "Hello from web api: " + Environment.MachineName;
 });
+
+app.UseSerilogRequestLogging();
 
 Log.Information("✅ Starting the app");
 
