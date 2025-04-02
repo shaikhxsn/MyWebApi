@@ -52,7 +52,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add $DEPLOYMENT_FILE
-          git commit -m "Update image to $DOCKER_IMAGE:${{ env.IMAGE_TAG }}"
+          git commit -m "Deploy release"
           git push origin ${{ env.MANIFESTS_BRANCH }}
           
       
