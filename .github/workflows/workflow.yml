@@ -9,7 +9,7 @@ on:
 
 env:
   DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/api
-  MANIFESTS_REPO: shaikhxsn/argo-app
+  MANIFESTS_REPO: shaikhxsn/k8s-manifests
   MANIFESTS_BRANCH: main
   DEPLOYMENT_FILE: my-api/deployment.yml
 
